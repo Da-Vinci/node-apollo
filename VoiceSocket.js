@@ -81,11 +81,6 @@ class VoiceSocket {
             data.heartbeat_interval
           );
         }
-
-        this.Dispatcher.emit(
-          Events.VOICE_READY,
-          {socket: this, data: data}
-        );
       } else if (op === OPCODE_SPEAKING) {
         this.canStream && this.audioTransportSocket.connected ?
           emitSpeaking(data) :
