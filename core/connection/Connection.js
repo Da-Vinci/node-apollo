@@ -1,10 +1,15 @@
 
 "use strict";
 
+const Constants = require("../Constants");
+
+
 class Connection {
+
   constructor() {
 
   }
+
 }
 
 

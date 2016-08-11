@@ -2,8 +2,6 @@
 "use strict";
 
 const Constants = {
-  WSS_URL: "wss://something.com",
-
   OPCodes: {
     DISPATCH: 0,
     IDENTIFY: 1,
