@@ -8,7 +8,6 @@ const EncryptionModes = Constants.EncryptionModes;
 const AudioEncoder = require("../../voice/AudioEncoder");
 const AudioDecoder = require("../../voice/AudioDecoder");
 const VoiceUDP = require("../voicetransports/VoiceUDP");
-const DiscordieError = require("../../core/DiscordieError");
 
 const OPCODE_IDENTIFY = 0;
 const OPCODE_SELECT_PROTOCOL = 1;
@@ -20,9 +19,7 @@ const OPCODE_SPEAKING = 5;
 const VOICE_SESSION_DESCRIPTION_TIMEOUT = 30 * 1000; // 30 seconds
 
 class VoiceSocket {
-  constructor(_gateway, guildId) {
-    this.Dispatcher = _gateway.Dispatcher;
-    this.gatewaySocket = _gateway;
+  constructor(guildId) {
     this.guildId = guildId;
     this.socket = null;
     this.audioEncoder = new AudioEncoder(this);
@@ -54,11 +51,6 @@ class VoiceSocket {
       throw new Error("Called 'connect' on disposed VoiceSocket");
 
     const emitSpeaking = (packet) => {
-      this.Dispatcher.emit(
-        Events.VOICE_SPEAKING,
-        {socket: this, data: packet}
-        //data.user_id, data.ssrc, data.speaking
-      );
       if (this.audioDecoder)
         this.audioDecoder.assignUser(packet.ssrc, packet.user_id);
     };
@@ -67,8 +59,6 @@ class VoiceSocket {
     this.voiceServerURL = "wss://" + server;
     this.socket = new BaseSocket(this.voiceServerURL);
     this.socket.on("open", e => {
-      this.Dispatcher.emit(Events.VOICESOCKET_OPEN, {socket: this});
-
       this.identify(serverId, userId, sessionId, voiceToken);
 
       this.socket._startTimeout(() => {
@@ -112,12 +102,6 @@ class VoiceSocket {
         }
 
         if (this.canStream) {
-          this.Dispatcher.emit(
-            Events.VOICE_SESSION_DESCRIPTION,
-            {socket: this, data: data}
-            //data.secret_key, data.mode
-          );
-
           this.speakingQueue.forEach(packet => emitSpeaking(packet));
           this.speakingQueue.length = 0;
 
@@ -137,7 +121,6 @@ class VoiceSocket {
       let msg = {socket: this, error: new Error(Errors.VOICE_MANUAL_DISCONNECT)};
       if (error) msg.error = error;
       if (description) msg.description = description;
-      this.Dispatcher.emit(Events.VOICESOCKET_DISCONNECT, msg);
     }
 
     if (this.audioTransportSocket) {

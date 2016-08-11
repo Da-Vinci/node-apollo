@@ -1,7 +1,6 @@
 "use strict";
 
-const BrowserWebSocket = require("./BrowserWebSocket");
-const WebSocket = BrowserWebSocket.available ? BrowserWebSocket : require("ws");
+const WebSocket = require("ws");
 const Constants = require("../../Constants");
 
 const heartbeat = new WeakMap();
