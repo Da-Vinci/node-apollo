@@ -9,22 +9,26 @@ const Constants = require("../Constants");
 
 class Controller {
 
-  constructor() {
+  constructor(wssUrl) {
+    this.wssUrl = wssUrl;
     this.websocket = null;
 
     this.token = null;
     this.connections = new Map();
   }
 
-  play(guildId, url) {
-    var connectionProcess = this.getConnection(guildId);
+  play(voiceData, url) {
+    let connectionProcess = this.getConnection(voiceData.guildId);
 
-    connectionProcess.send({
+    let data = {
       type: Constants.Operations.AUDIO_PLAY,
       data: {
+        voiceData: voiceData
         url: url
       }
-    });
+    };
+
+    connectionProcess.send(data);
   }
 
   stop(guildId) {
@@ -33,7 +37,7 @@ class Controller {
 
 
   getConnection(guildId) {
-    var connectionProcess = this.connections.get(guildId);
+    let connectionProcess = this.connections.get(guildId);
 
     if (!connectionProcess) {
       connectionProcess = this.createConnection(guildId);
@@ -43,7 +47,7 @@ class Controller {
   }
 
   createConnection(guildId) {
-    var connectionProcess = child_process.fork("../connection/connectionProcess", [guildId]);
+    let connectionProcess = child_process.fork("../connection/connectionProcess", [guildId]);
     this.hookConnectionProccess(connectionProcess);
     this.connections.set(guildId, connectionProcess);
 
@@ -51,7 +55,7 @@ class Controller {
   }
 
   destroyConnection(guildId) {
-    var connectionProcess = this.connections.get(guildId);
+    let connectionProcess = this.connections.get(guildId);
     if (!connectionProcess) return;
 
     connectionProcess.kill("SIGINT");
@@ -59,8 +63,6 @@ class Controller {
   }
 
   hookConnectionProccess(guildId, connectionProcess) {
-    var self = this;
-
     const Events = Constants.Events;
 
     connectionProcess.on("message", (message) => {
@@ -70,7 +72,7 @@ class Controller {
       switch (type) {
 
         case Events.AUDIO_ENDED:
-          var data = {
+          let data = {
             op: Constants.OPCodes.DISPATCH,
             d: data
           };
@@ -84,18 +86,22 @@ class Controller {
 
       }
     });
+
+    connectionProcess.on("SIGINT", () => {
+      this.destroyConnection(guildId);
+    });
   }
 
   connect() {
     if (this.websocket) return;
 
-    this.websocket = new WebSocket("wss://something.com");
+    this.websocket = new WebSocket(this.wssUrl);
 
-    var self = this;
-    var ws = this.websocket;
+    let self = this;
+    let ws = this.websocket;
 
     ws.on("open", () => {
-      var data = {
+      const data = {
         op: Constants.OPCodes.IDENTIFY,
         d: {
           token: "magic"
@@ -127,7 +133,7 @@ class Controller {
   }
 
   send(data) {
-    var ws = this.websocket;
+    let ws = this.websocket;
     if (!ws) return;
 
     ws.send(data);
@@ -166,10 +172,14 @@ class Controller {
     switch (type) {
 
       case Operations.AUDIO_PLAY:
-        const guildId = data.guildId;
-        const url = data.url;
+        const voiceData = {
+          endpoint:   data.endpoint,
+          channelId:  data.channelId,
+          userId:     data.userId,
+          sessionId:  data.sessionId
+        };
 
-        this.play(guildId, url);
+        this.play(voiceData, url);
 
         break;
 

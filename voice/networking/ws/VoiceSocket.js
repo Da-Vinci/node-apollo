@@ -43,7 +43,7 @@ class VoiceSocket {
     }
     return "none";
   }
-  connect(server, serverId, userId, sessionId, voiceToken) {
+  connect(server, serverId, userId, sessionId, voiceToken, callback) {
     if (this.connected)
       this.disconnect();
 
@@ -60,6 +60,10 @@ class VoiceSocket {
     this.socket = new BaseSocket(this.voiceServerURL);
     this.socket.on("open", e => {
       this.identify(serverId, userId, sessionId, voiceToken);
+
+      if (callback && typeof(callback) === "function") {
+        callback();
+      }
 
       this.socket._startTimeout(() => {
         return this.disconnect(new DiscordieError(
