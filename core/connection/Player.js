@@ -108,6 +108,16 @@ class Player extends EventEmitter {
     this.playing = false;
   }
 
+  disconnect() {
+    if (!this.voiceConnection) return;
+
+    let voiceConnection = this.voiceConnection;
+    let encoderStream = voiceConnection.encoderStream();
+
+    encoderStream.unpipeAll();
+    voiceConnection.disconnect();
+  }
+
   setVolume(volume) {
     if (!this.voiceConnection) return;
 
@@ -130,6 +140,7 @@ class Player extends EventEmitter {
   }
 
   ended() {
+    this.playing = false;
     this.emit("ended");
   }
 
