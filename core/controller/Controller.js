@@ -71,18 +71,18 @@ class Controller {
 
       switch (type) {
 
-        case Events.AUDIO_ENDED:
-          let data = {
-            op: Constants.OPCodes.DISPATCH,
-            d: data
-          };
+      case Events.AUDIO_ENDED:
+        var eventData = {
+          op: Constants.OPCodes.DISPATCH,
+          d: data
+        };
 
-          this.send(data);
-          break;
+        this.send(eventData);
+        break;
 
-        default:
-          console.log(`Unknown IPC type: ${type}`);
-          break;
+      default:
+        console.log(`Unknown IPC type: ${type}`);
+        break;
 
       }
     });
@@ -148,17 +148,17 @@ class Controller {
 
     switch (packet.op) {
 
-      case OPCodes.DISPATCH:
-        this.processWebsocketDispatch(packet);
-        break;
+    case OPCodes.DISPATCH:
+      this.processWebsocketDispatch(packet);
+      break;
 
-      case OPCodes.CONNECTED:
-        this.token = data.token;
-        break;
+    case OPCodes.CONNECTED:
+      this.token = data.token;
+      break;
 
-      default:
-        console.log(`Unknown WS op code: ${op}`);
-        break;
+    default:
+      console.log(`Unknown WS op code: ${op}`);
+      break;
 
     }
   }
@@ -171,40 +171,40 @@ class Controller {
 
     switch (type) {
 
-      case Operations.AUDIO_PLAY:
-        const voiceData = {
-          endpoint:   data.endpoint,
-          channelId:  data.channelId,
-          userId:     data.userId,
-          sessionId:  data.sessionId
-        };
+    case Operations.AUDIO_PLAY:
+      var voiceData = {
+        endpoint:   data.endpoint,
+        channelId:  data.channelId,
+        userId:     data.userId,
+        sessionId:  data.sessionId
+      };
 
-        this.play(voiceData, url);
+      this.play(voiceData, data.url);
 
-        break;
+      break;
 
-      case Operations.AUDIO_STOP:
-        const guildId = data.gulidId;
+    case Operations.AUDIO_STOP:
+      var guildId = data.gulidId;
 
-        this.stop(guildId);
+      this.stop(guildId);
 
-        break;
+      break;
 
-      case Operations.AUDIO_VOLUME:
+    case Operations.AUDIO_VOLUME:
 
-        break;
+      break;
 
-      case Operations.AUDIO_PAUSE:
+    case Operations.AUDIO_PAUSE:
 
-        break;
+      break;
 
-      case Operations.AUDIO_RESUME:
+    case Operations.AUDIO_RESUME:
 
-        break;
+      break;
 
-      default:
-        console.log(`Unknown WS packet type: ${type}`);
-        break;
+    default:
+      console.log(`Unknown WS packet type: ${type}`);
+      break;
 
     }
   }

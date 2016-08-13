@@ -3,6 +3,8 @@
 
 const Constants = require("../Constants");
 
+const Player = require("./Player");
+
 
 class Connection {
 
@@ -25,36 +27,36 @@ class Connection {
 
       switch (type) {
 
-        case Operations.AUDIO_PLAY:
-          self.player.play(data);
+      case Operations.AUDIO_PLAY:
+        self.player.play(data);
 
-          break;
+        break;
 
-        case Operations.AUDIO_STOP:
-          self.player.stop();
-          self.player.disconnect();
-          self.destroy();
+      case Operations.AUDIO_STOP:
+        self.player.stop();
+        self.player.disconnect();
+        self.destroy();
 
-          break;
+        break;
 
-        case Operations.AUDIO_VOLUME:
-          self.player.setVolume(data.volume);
+      case Operations.AUDIO_VOLUME:
+        self.player.setVolume(data.volume);
 
-          break;
+        break;
 
-        case Operations.AUDIO_PAUSE:
-          self.player.pause();
+      case Operations.AUDIO_PAUSE:
+        self.player.pause();
 
-          break;
+        break;
 
-        case Operations.AUDIO_RESUME:
-          self.player.resume();
+      case Operations.AUDIO_RESUME:
+        self.player.resume();
 
-          break;
+        break;
 
-        default:
-          console.log(`Unknown IPC type: ${type}`);
-          break;
+      default:
+        console.log(`Unknown IPC type: ${type}`);
+        break;
 
       }
     });

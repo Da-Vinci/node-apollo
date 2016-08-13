@@ -19,7 +19,7 @@ const Constants = {
   Events: {
     AUDIO_ENDED: 0
   }
-}
+};
 
 
 module.exports = Constants;

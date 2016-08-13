@@ -43,7 +43,7 @@ class Player extends EventEmitter {
       return this.voiceConnection;
     }
 
-    let voiceSocket = createVoiceSocket(endpoint, guildId, channelId, userId, sessionId, token, callback);
+    let voiceSocket = this.createVoiceSocket(endpoint, guildId, channelId, userId, sessionId, token, callback);
     let voiceConnection = new IVoiceConnection(voiceSocket);
     this.voiceConnection = voiceConnection;
 
@@ -58,7 +58,7 @@ class Player extends EventEmitter {
     let self = this;
 
     return new Promise((resolve) => {
-      createVoiceConnection(endpoint, this.guildId, channelId, userId, sessionId, this.token, () => {
+      this.createVoiceConnection(endpoint, this.guildId, channelId, userId, sessionId, this.token, () => {
         resolve(self.voiceConnection);
       });
     });
@@ -71,7 +71,7 @@ class Player extends EventEmitter {
       this.stop();
     }
 
-    let voiceConnection = this.getVoiceConnection(data.endpoint, data.channelId, data.userId, data.sessionId).then((voiceConnection) => {
+    this.getVoiceConnection(data.endpoint, data.channelId, data.userId, data.sessionId).then((voiceConnection) => {
       let encoder = voiceConnection.createExternalEncoder({
         type: "ffmpeg",
         format: "opus",
