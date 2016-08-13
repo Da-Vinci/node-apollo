@@ -23,7 +23,7 @@ class Controller {
     let data = {
       type: Constants.Operations.AUDIO_PLAY,
       data: {
-        voiceData: voiceData
+        voiceData: voiceData,
         url: url
       }
     };
