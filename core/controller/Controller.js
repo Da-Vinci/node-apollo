@@ -62,6 +62,23 @@ class Controller {
     this.connections.delete(guildId);
   }
 
+  sendConnection(guildId, data) {
+    let connectionProcess = this.connections.get(guildId);
+    if (!connectionProcess) return;
+
+    connectionProcess.send(data);
+  }
+
+  replicatePacket(packet) {
+    const type = packet.t;
+    const data = packet.d;
+
+    this.sendConnection(data.guildId, {
+      type: type,
+      data: data
+    });
+  }
+
   hookConnectionProccess(guildId, connectionProcess) {
     const Events = Constants.Events;
 
@@ -108,7 +125,7 @@ class Controller {
         }
       };
 
-      self.send(data);
+      self.sendWS(data);
     });
 
     ws.on("message", (data) => {
@@ -132,7 +149,7 @@ class Controller {
     this.websocket = null;
   }
 
-  send(data) {
+  sendWS(data) {
     let ws = this.websocket;
     if (!ws) return;
 
@@ -184,21 +201,22 @@ class Controller {
       break;
 
     case Operations.AUDIO_STOP:
-      var guildId = data.gulidId;
-
-      this.stop(guildId);
+      this.stop(data.guildId);
 
       break;
 
     case Operations.AUDIO_VOLUME:
+      this.replicatePacket(packet);
 
       break;
 
     case Operations.AUDIO_PAUSE:
+      this.replicatePacket(packet);
 
       break;
 
     case Operations.AUDIO_RESUME:
+      this.replicatePacket(packet);
 
       break;
 
