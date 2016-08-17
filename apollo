@@ -3,4 +3,4 @@
 require('dotenv').config({ silent: true });
 
 const Controller = require("./lib").Controller;
-const controller = new Controller({ wssUrl: process.env.WS_URL });
+const controller = new Controller({ wssUrl: process.env.WSS_URL });

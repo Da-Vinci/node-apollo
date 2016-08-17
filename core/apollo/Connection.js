@@ -44,7 +44,7 @@ class Connection extends EventEmitter {
    * @private
    */
   getController() {
-    if (!this.apollo) throw new Error("Connection is not registered yet");
+    if (!this.apollo) throw new Error("Apollo instance not present, did you initialize the Connection properly?");
     if (this.controller) return this.controller;
 
     let controller = this.apollo.lowestLoadController;
