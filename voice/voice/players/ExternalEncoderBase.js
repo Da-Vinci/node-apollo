@@ -2,9 +2,14 @@
 
 const fs = require("fs");
 const path = require("path");
-const ffmpeg = require('ffmpeg-static');
 const spawn = require("child_process").spawn;
 const EventEmitter = require("events").EventEmitter;
+
+try {
+  var ffmpeg = require('ffmpeg-static');
+} catch (e) {
+  // optional
+}
 
 const Utils = require("../../core/Utils");
 
@@ -23,8 +28,7 @@ class ExternalEncoderBase extends EventEmitter {
     this._disposed = false;
   }
   _createProcess(executable, args, options) {
-    if (ffmpeg.path) {
-      console.log(ffmpeg.path);
+    if (ffmpeg && ffmpeg.path) {
       return spawn(ffmpeg.path, args, options);
     }
 

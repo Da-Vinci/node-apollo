@@ -1,0 +1,24 @@
+{
+  "name": "node-apollo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Da-Vinci/node-apollo.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Da-Vinci/node-apollo/issues"
+  },
+  "homepage": "https://github.com/Da-Vinci/node-apollo#readme",
+  "dependencies": {
+    "dotenv": "^2.0.0",
+    "ebml": "^2.2.0",
+    "ws": "^1.1.1"
+  }
+}

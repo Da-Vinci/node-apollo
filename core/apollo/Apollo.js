@@ -45,13 +45,17 @@ class Apollo {
 
     if (!process.env.APOLLO_TOKEN) throw new Error("Missing environment variable APOLLO_TOKEN");
 
-    this.wss = new WebSocketServer({port: 8080});
+    this.wss = new WebSocketServer({port: 8443});
 
     let wss = this.wss;
 
     wss.on("connection", (ws) => {
       let controller = new Controller(ws);
       this.controllers.push(controller);
+    });
+
+    wss.on("error", (e) => {
+      console.error(e);
     });
   }
 
