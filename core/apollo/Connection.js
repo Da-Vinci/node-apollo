@@ -12,6 +12,7 @@ const Operations = OPCodes.Operations;
  * Connection interface object
  * @class Connection
  * @extends EventEmitter
+ * @param {Apollo} apollo The Apollo instance
  * @param {Object} data The connection data
  * @param {String} data.endpoint The voice endpoint
  * @param {Number} data.guildId The guild id of the connection
@@ -21,8 +22,10 @@ const Operations = OPCodes.Operations;
  */
 class Connection extends EventEmitter {
 
-  constructor(data) {
+  constructor(apollo, data) {
     super();
+
+    this.apollo = apollo;
 
     this.endpoint   = data.endpoint;
     this.guildId    = data.guildId;

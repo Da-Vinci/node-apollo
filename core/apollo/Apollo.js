@@ -27,15 +27,7 @@ class Apollo {
 
     this.start();
   }
-
-
-  /**
-   * Register a connection object (must be registered before attempting to perform actions)
-   * @param {Connection} connection The connection to register
-   */
-  registerConnection(connection) {
-    connection.apollo = this;
-  }
+  
 
   /**
    * Get the controller with the lowest load
