@@ -36,6 +36,8 @@ class Controller {
 
     this.token = null;
     this.connections = new Map();
+
+    this.connect();
   }
 
 

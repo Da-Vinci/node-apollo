@@ -24,6 +24,8 @@ class Apollo {
     this.controllers = [];
 
     this.connections = new Map();
+
+    this.start();
   }
 
 
