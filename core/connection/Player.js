@@ -7,6 +7,16 @@ const VoiceSocket = require("../../voice/networking/ws/VoiceSocket");
 const IVoiceConnection = require("../../voice/interfaces/IVoiceConnection");
 
 
+/**
+ * Manages the voice connection and playing audio
+ * @class Player
+ * @extends EventEmitter
+ * @param {Number} guildId The guild id of the connection
+ * @param {String} token The token of the bot
+ * @prop {VoiceSocket} voiceSocket The VoiceSocket of the player
+ * @prop {VoiceConnection} voiceConnection The VoiceConnection of the player
+ * @prop {Boolean} playing Whether the player is currently playing
+ */
 class Player extends EventEmitter {
 
   constructor(guildId, token) {
@@ -21,6 +31,17 @@ class Player extends EventEmitter {
   }
 
 
+  /**
+   * Create the VoiceSocket
+   * @param {String} endpoint The endpoint of the VoiceSocket
+   * @param {Number} guildId The guild id of the VoiceSocket
+   * @param {Number} channelId The channel id of the VoiceSocket
+   * @param {Number} userId The user id of the VoiceSocket
+   * @param {Number} sessionId The session id of the VoiceSocket
+   * @param {String} token The token of the bot
+   * @returns VoiceSocket
+   * @private
+   */
   createVoiceSocket(endpoint, guildId, channelId, userId, sessionId, token) {
     const canReconnect = endpoint ? true : false;
 
@@ -38,6 +59,18 @@ class Player extends EventEmitter {
     return voiceSocket;
   }
 
+  /**
+   * Create the VoiceConnection
+   * @param {String} endpoint The endpoint of the VoiceSocket
+   * @param {Number} guildId The guild id of the VoiceSocket
+   * @param {Number} channelId The channel id of the VoiceSocket
+   * @param {Number} userId The user id of the VoiceSocket
+   * @param {Number} sessionId The session id of the VoiceSocket
+   * @param {String} token The token of the bot
+   * @param {Function} callback Called when the VoiceSocket successfully connects
+   * @returns VoiceConnection
+   * @private
+   */
   createVoiceConnection(endpoint, guildId, channelId, userId, sessionId, token, callback) {
     if (this.voiceConnection) {
       return this.voiceConnection;
@@ -50,6 +83,16 @@ class Player extends EventEmitter {
     return voiceConnection;
   }
 
+
+  /**
+   * Get or create the VoiceConnection if it doesn't exist
+   * @param {String} endpoint The endpoint of the VoiceSocket
+   * @param {Number} channelId The channel id of the VoiceSocket
+   * @param {Number} userId The user id of the VoiceSocket
+   * @param {Number} sessionId The session id of the VoiceSocket
+   * @returns Promise
+   * @private
+   */
   getVoiceConnection(endpoint, channelId, userId, sessionId) {
     if (this.voiceConnection) {
       return this.voiceConnection;
@@ -64,9 +107,16 @@ class Player extends EventEmitter {
     });
   }
 
+  /**
+   * Start playing audio from a URL
+   * @param {String} url The URL source of the audio to play
+   * @param {String} endpoint The endpoint of the VoiceSocket
+   * @param {Number} channelId The channel id of the VoiceSocket
+   * @param {Number} userId The user id of the VoiceSocket
+   * @param {Number} sessionId The session id of the VoiceSocket
+   * @private
+   */
   play(data) {
-    let self = this;
-
     if (this.playing) {
       this.stop();
     }
@@ -81,13 +131,18 @@ class Player extends EventEmitter {
       });
 
       let encoderStream = encoder.play();
+      this.started();
 
       encoder.once("end", () => {
-        self.ended();
+        this.ended();
       });
     });
   }
 
+  /**
+   * Stop playing audio
+   * @private
+   */
   stop() {
     if (!this.playing) return;
 
@@ -108,6 +163,10 @@ class Player extends EventEmitter {
     this.playing = false;
   }
 
+  /**
+   * Disconnect the VoiceConnection
+   * @private
+   */
   disconnect() {
     if (!this.voiceConnection) return;
 
@@ -118,6 +177,11 @@ class Player extends EventEmitter {
     voiceConnection.disconnect();
   }
 
+  /**
+   * Set the volume of the audio
+   * @param {Number} volume The new volume
+   * @private
+   */
   setVolume(volume) {
     if (!this.voiceConnection) return;
 
@@ -125,6 +189,10 @@ class Player extends EventEmitter {
     encoder.setVolume(volume);
   }
 
+  /**
+   * Pause the audio playback
+   * @private
+   */
   pause() {
     if (!this.voiceConnection) return;
 
@@ -132,6 +200,10 @@ class Player extends EventEmitter {
     encoderStream.cork();
   }
 
+  /**
+   * Start the audio playback
+   * @private
+   */
   resume() {
     if (!this.voiceConnection) return;
 
@@ -139,9 +211,23 @@ class Player extends EventEmitter {
     encoderStream.uncork();
   }
 
+
+  /**
+   * Called when audio starts
+   * @private
+   */
+  started() {
+    this.playing = true;
+    this.emit("start");
+  }
+
+  /**
+   * Called when audio ends
+   * @private
+   */
   ended() {
     this.playing = false;
-    this.emit("ended");
+    this.emit("end");
   }
 
 }

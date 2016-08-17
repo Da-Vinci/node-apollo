@@ -2,10 +2,19 @@
 "use strict";
 
 const Constants = require("../Constants");
+const Operations = Constants.Operations;
+const Events = Constants.Events;
 
 const Player = require("./Player");
 
 
+/**
+ * VoiceConnection manager process
+ * @class Connection
+ * @param {Number} guildId The guild id of the connection
+ * @param {String} token The token of the bot
+ * @prop {Player} player The player for this connection
+ */
 class Connection {
 
   constructor(guildId, token) {
@@ -15,12 +24,11 @@ class Connection {
     this.player = new Player(guildId, token);
   }
 
+  /**
+   * Start the audio player and IPC listener
+   * @private
+   */
   start() {
-    let self = this;
-
-    const Operations = Constants.Operations;
-    const Events = Constants.Events;
-
     process.on("message", (message) => {
       const type = message.type;
       const data = message.data;
@@ -28,29 +36,29 @@ class Connection {
       switch (type) {
 
       case Operations.AUDIO_PLAY:
-        self.player.play(data);
+        this.player.play(data);
 
         break;
 
       case Operations.AUDIO_STOP:
-        self.player.stop();
-        self.player.disconnect();
-        self.destroy();
+        this.player.stop();
+        this.player.disconnect();
+        this.destroy();
 
         break;
 
       case Operations.AUDIO_VOLUME:
-        self.player.setVolume(data.volume);
+        this.player.setVolume(data.volume);
 
         break;
 
       case Operations.AUDIO_PAUSE:
-        self.player.pause();
+        this.player.pause();
 
         break;
 
       case Operations.AUDIO_RESUME:
-        self.player.resume();
+        this.player.resume();
 
         break;
 
@@ -61,16 +69,33 @@ class Connection {
       }
     });
 
-    this.player.on("ended", () => {
+    this.player.on("start", () => {
       let data = {
-        type: Events.AUDIO_ENDED,
-        data: {}
+        type: Events.AUDIO_START,
+        data: {
+          guildId: this.guildId
+        }
+      };
+
+      process.send(data);
+    });
+
+    this.player.on("end", () => {
+      let data = {
+        type: Events.AUDIO_END,
+        data: {
+          guildId: this.guildId
+        }
       };
 
       process.send(data);
     });
   }
 
+  /**
+   * Kill this process
+   * @private
+   */
   destroy() {
     process.kill("SIGINT");
   }

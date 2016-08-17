@@ -5,7 +5,8 @@ const Constants = {
   OPCodes: {
     DISPATCH: 0,
     IDENTIFY: 1,
-    CONNECTED: 2
+    CONNECTED: 2,
+    HEARTBEAT: 3
   },
 
   Operations: {
@@ -17,7 +18,8 @@ const Constants = {
   },
 
   Events: {
-    AUDIO_ENDED: 0
+    AUDIO_START: 0,
+    AUDIO_END: 1
   }
 };
 
