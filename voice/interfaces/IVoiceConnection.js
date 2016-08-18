@@ -24,8 +24,8 @@ class IVoiceConnection {
     this._lastChannelId = null;
     Utils.privatify(this);
 
-    // if (!this.canStream)
-    //   throw new Error("Failed to create IVoiceConnection");
+    if (!this.canStream)
+      throw new Error("Failed to create IVoiceConnection");
   }
   dispose() {
     this._lastChannelId = this.channelId;
