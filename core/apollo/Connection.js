@@ -5,7 +5,7 @@ const EventEmitter = require("events").EventEmitter;
 
 const Constants = require("../Constants");
 const OPCodes = Constants.OPCodes;
-const Operations = OPCodes.Operations;
+const Operations = Constants.Operations;
 
 
 /**
@@ -18,6 +18,7 @@ const Operations = OPCodes.Operations;
  * @param {Number} data.guildId The guild id of the connection
  * @param {Number} data.userId The id of the user the connection exists for
  * @param {Number} data.sessionId The id of the current session
+ * @param {String} data.token The connection's voice token
  * @prop {Apollo} apollo The Apollo instance this Connection is managed by (null if not yet registered)
  */
 class Connection extends EventEmitter {
@@ -32,8 +33,8 @@ class Connection extends EventEmitter {
     this.channelId  = data.channelId;
     this.userId     = data.userId;
     this.sessionId  = this.sessionId;
+    this.token      = this.token;
 
-    this.apollo = null;
     this.controller = null;
   }
 
@@ -49,6 +50,10 @@ class Connection extends EventEmitter {
 
     let controller = this.apollo.lowestLoadController;
     this.controller = controller;
+
+    if (!controller) {
+      return null;
+    }
 
     // Hook events
     controller.on("start", (data) => {
@@ -79,7 +84,8 @@ class Connection extends EventEmitter {
         guildId: this.guildId,
         channelId: this.channelId,
         userId: this.userId,
-        sessionId: this.sessionId
+        sessionId: this.sessionId,
+        token: this.token
       }
     });
   }

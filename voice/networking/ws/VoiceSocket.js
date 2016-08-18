@@ -4,6 +4,7 @@ const BaseSocket = require("./BaseSocket");
 const Constants = require("../../Constants");
 const Errors = Constants.Errors;
 const Events = Constants.Events;
+const DiscordieError = require("../../core/DiscordieError");
 const EncryptionModes = Constants.EncryptionModes;
 const AudioEncoder = require("../../voice/AudioEncoder");
 const AudioDecoder = require("../../voice/AudioDecoder");
@@ -61,10 +62,6 @@ class VoiceSocket {
     this.socket.on("open", e => {
       this.identify(serverId, userId, sessionId, voiceToken);
 
-      if (callback && typeof(callback) === "function") {
-        callback();
-      }
-
       this.socket._startTimeout(() => {
         return this.disconnect(new DiscordieError(
           Errors.VOICE_SESSION_DESCRIPTION_TIMEOUT
@@ -84,6 +81,12 @@ class VoiceSocket {
             () => this.heartbeat(),
             data.heartbeat_interval
           );
+        }
+
+        this.connectAudioTransport(data.ssrc, data.port, data.modes);
+
+        if (callback && typeof(callback) === "function") {
+          callback();
         }
       } else if (op === OPCODE_SPEAKING) {
         this.canStream && this.audioTransportSocket.connected ?

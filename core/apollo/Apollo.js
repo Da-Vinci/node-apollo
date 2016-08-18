@@ -10,7 +10,6 @@ const Controller = require("./Controller");
  * The Apollo manager instance
  * @class Apollo
  * @param {Object} options Options for the apollo instance
- * @param {String} options.token The token for the Discord bot
  * @prop {WebSocketServer} wss The websocket server being managed
  * @prop {Array<Controller>} controllers Controllers connected to this Apollo instance
  * @prop {Map<Connection>} connections Registered connections
@@ -18,8 +17,6 @@ const Controller = require("./Controller");
 class Apollo {
 
   constructor(options) {
-    this.token = options.token;
-
     this.wss = null;
     this.controllers = [];
 
@@ -27,14 +24,14 @@ class Apollo {
 
     this.start();
   }
-  
+
 
   /**
    * Get the controller with the lowest load
    * @returns Controller
   */
   get lowestLoadController() {
-    this.controllers.sort((a, b) => a.load - b.load)[0];
+    return this.controllers.sort((a, b) => a.load - b.load)[0];
   }
 
   /**

@@ -1,7 +1,7 @@
 "use strict";
 
 const events = require("events");
-const nopus = () => require("../../../deps/nopus");
+const nopus = () => require("../../deps/nopus");
 const Utils = require("../../core/Utils");
 const Constants = require("../../Constants");
 const AudioResampler = require("../AudioResampler");

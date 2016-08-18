@@ -49,7 +49,7 @@ class Controller extends EventEmitter {
     let ws = this.websocket;
     if (!ws) return;
 
-    ws.send(data);
+    ws.send(JSON.stringify(data));
   }
 
   /**
@@ -71,7 +71,15 @@ class Controller extends EventEmitter {
       break;
 
     case OPCodes.IDENTIFY:
-      this.token = data.token;
+      if (data.token === process.env.APOLLO_TOKEN) {
+        this.sendWS({
+          op: OPCodes.CONNECTED,
+          d: {
+            token: this.token
+          }
+        });
+      }
+
       break;
 
     case OPCodes.HEARTBEAT:

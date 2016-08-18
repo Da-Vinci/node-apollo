@@ -3,8 +3,8 @@
 
 const Connection = require("./Connection");
 
-const GUILD_ID = process.argv[2];
-const TOKEN = process.argv[3];
+const data = JSON.parse(process.argv[2]);
+const GUILD_ID = data.guildId;
 
-var connection = new Connection(GUILD_ID, TOKEN);
+var connection = new Connection(GUILD_ID);
 connection.start();

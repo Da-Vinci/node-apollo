@@ -12,16 +12,14 @@ const Player = require("./Player");
  * VoiceConnection manager process
  * @class Connection
  * @param {Number} guildId The guild id of the connection
- * @param {String} token The token of the bot
  * @prop {Player} player The player for this connection
  */
 class Connection {
 
-  constructor(guildId, token) {
+  constructor(guildId) {
     this.guildId = guildId;
-    this.token = token;
 
-    this.player = new Player(guildId, token);
+    this.player = new Player(guildId);
   }
 
   /**

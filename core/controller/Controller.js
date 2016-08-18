@@ -17,7 +17,7 @@ const Events = Constants.Events;
  * @class Controller
  * @param {Object} options Controller options
  * @param {String?} options.name An identifier for the controller, optional
- * @param {String} options.wsssUrl The websocket url to connect to
+ * @param {String} options.wsURL The websocket url to connect to
  * @param {Number} options.reconnectTimeout The timeout (in seconds) before attempting to re-connect to a closed websocket
  * @prop {WebSocket} websocket The websocket of the controller
  * @prop {Number} heartbeatInterval The interval ID of the heartbeat interval
@@ -28,7 +28,7 @@ class Controller {
 
   constructor(options) {
     this.name = options.name;
-    this.wssUrl = options.wssUrl;
+    this.wsURL = options.wsURL;
     this.reconnectTimeout = options.reconnectTimeout || 5000;
 
     this.websocket = null;
@@ -96,8 +96,8 @@ class Controller {
    * @private
    */
   createConnection(guildId) {
-    let connectionProcess = child_process.fork("../connection/connectionProcess", [guildId]);
-    this.hookConnectionProccess(connectionProcess);
+    let connectionProcess = child_process.fork("./core/connection/connectionProcess", [JSON.stringify({guildId: guildId})]);
+    this.hookConnectionProccess(guildId, connectionProcess);
     this.connections.set(guildId, connectionProcess);
 
     return connectionProcess;
@@ -200,7 +200,7 @@ class Controller {
 
     if (!process.env.APOLLO_TOKEN) throw new Error("Missing environment variable APOLLO_TOKEN");
 
-    this.websocket = new WebSocket(this.wssUrl);
+    this.websocket = new WebSocket(this.wsURL);
 
     let ws = this.websocket;
 
@@ -221,7 +221,7 @@ class Controller {
     });
 
     ws.on("message", (data) => {
-      this.processWebsocketMessage(data);
+      this.processWSMessage(data);
     });
 
     ws.on("close", () => {
@@ -262,7 +262,7 @@ class Controller {
     let ws = this.websocket;
     if (!ws) return;
 
-    ws.send(data);
+    ws.send(JSON.stringify(data));
   }
 
   /**
@@ -274,7 +274,7 @@ class Controller {
       op: OPCodes.HEARTBEAT,
       d: {
         timestamp: Date.now(),
-        loadAvg: os.loadavg(),
+        loadavg: os.loadavg(),
         cpus: os.cpus().length
       }
     });
@@ -300,7 +300,7 @@ class Controller {
       break;
 
     case OPCodes.CONNECTED:
-      this.token = data.token;
+
 
       break;
 
@@ -330,7 +330,8 @@ class Controller {
         endpoint:   data.endpoint,
         channelId:  data.channelId,
         userId:     data.userId,
-        sessionId:  data.sessionId
+        sessionId:  data.sessionId,
+        token:      data.token
       };
 
       this.play(voiceData, data.url);
