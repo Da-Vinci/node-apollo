@@ -1,9 +1,9 @@
 "use strict";
 
-const ExternalEncoderBase = require("./ExternalEncoderBase");
+const ExternalEncoderBase = require(__dirname + "/ExternalEncoderBase");
 
-const EBMLDecoder = require("./demuxers/EBMLDecoder");
-const WebmOpusDemuxer = require("./demuxers/WebmOpusDemuxer");
+const EBMLDecoder = require(__dirname + "/demuxers/EBMLDecoder");
+const WebmOpusDemuxer = require(__dirname + "/demuxers/WebmOpusDemuxer");
 
 function stderrDataListener(data) {
   process.stdout.write("[FFmpeg] " + data);

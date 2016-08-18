@@ -140,6 +140,10 @@ class Player extends EventEmitter {
       let encoderStream = encoder.play();
       this.started();
 
+      encoderStream.once('error', err => console.error(err));
+
+      encoder.once('error', err => console.error(err));
+
       encoder.once("end", () => {
         this.ended();
       });

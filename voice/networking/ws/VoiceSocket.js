@@ -4,12 +4,11 @@ const BaseSocket = require("./BaseSocket");
 const Constants = require("../../Constants");
 const Errors = Constants.Errors;
 const Events = Constants.Events;
-const DiscordieError = require("../../core/DiscordieError");
 const EncryptionModes = Constants.EncryptionModes;
-const DiscordieError = require('../../core/DiscordieError');
 const AudioEncoder = require("../../voice/AudioEncoder");
-// const AudioDecoder = require("../../voice/AudioDecoder");
+const AudioDecoder = require("../../voice/AudioDecoder");
 const VoiceUDP = require("../voicetransports/VoiceUDP");
+const DiscordieError = require("../../core/DiscordieError");
 
 const OPCODE_IDENTIFY = 0;
 const OPCODE_SELECT_PROTOCOL = 1;
@@ -24,9 +23,9 @@ class VoiceSocket {
   constructor(guildId) {
     this.guildId = guildId;
     this.socket = null;
-    // this.audioEncoder = new AudioEncoder(this);
-    // this.audioDecoder = new AudioDecoder(this);
-    // this.speakingQueue = [];
+    this.audioEncoder = new AudioEncoder(this);
+    this.audioDecoder = new AudioDecoder(this);
+    this.speakingQueue = [];
     this.disposed = false;
   }
   get canStream() {
@@ -52,21 +51,17 @@ class VoiceSocket {
     if (this.disposed)
       throw new Error("Called 'connect' on disposed VoiceSocket");
 
-    // const emitSpeaking = (packet) => {
-    //   if (this.audioDecoder)
-    //     this.audioDecoder.assignUser(packet.ssrc, packet.user_id);
-    // };
+    const emitSpeaking = (packet) => {
+      if (this.audioDecoder)
+        this.audioDecoder.assignUser(packet.ssrc, packet.user_id);
+    };
 
     this.voiceServer = server;
     this.voiceServerURL = "wss://" + server;
     this.socket = new BaseSocket(this.voiceServerURL);
     this.socket.on("open", e => {
-      console.log('vws open');
+      console.log('vWS Open');
       this.identify(serverId, userId, sessionId, voiceToken);
-
-      if (callback && typeof(callback) === "function") {
-        callback();
-      }
 
       this.socket._startTimeout(() => {
         return this.disconnect(new DiscordieError(
@@ -77,12 +72,12 @@ class VoiceSocket {
     this.socket.on("message", e => {
       if (!this.socket) return;
 
-
       const msg = JSON.parse(e);
       const op = msg.op;
       const data = msg.d;
 
       if (op === OPCODE_READY) {
+        console.log('vWS Ready');
         if (data.heartbeat_interval > 0) {
           this.socket.setHeartbeat(
             () => this.heartbeat(),
@@ -91,12 +86,12 @@ class VoiceSocket {
         }
 
         this.connectAudioTransport(data.ssrc, data.port, data.modes);
-        callback();
       } else if (op === OPCODE_SPEAKING) {
-        // this.canStream && this.audioTransportSocket.connected ?
-        //   emitSpeaking(data) :
-        //   this.speakingQueue.push(data);
+        this.canStream && this.audioTransportSocket.connected ?
+          emitSpeaking(data) :
+          this.speakingQueue.push(data);
       } else if (op === OPCODE_SESSION_DESCRIPTION) {
+        console.log('vWS Session Description');
         this.socket._stopTimeout();
 
         if (data.secret_key && data.secret_key.length > 0) {
@@ -107,13 +102,18 @@ class VoiceSocket {
           }
         }
 
-        // if (this.canStream) {
-        //   this.speakingQueue.forEach(packet => emitSpeaking(packet));
-        //   this.speakingQueue.length = 0;
+        if (this.canStream) {
+          this.speaking(true, 0);
+          this.speakingQueue.forEach(packet => emitSpeaking(packet));
+          this.speakingQueue.length = 0;
 
-        //   // required to start receiving audio from other users
-        //   this.audioTransportSocket.sendSenderInfo();
-        // }
+          // required to start receiving audio from other users
+          this.audioTransportSocket.sendSenderInfo();
+        }
+
+        if (callback && typeof(callback) === "function") {
+          callback();
+        }
       }
     });
 
@@ -139,18 +139,18 @@ class VoiceSocket {
       this.socket = null;
     }
 
-    // if (this.audioEncoder) {
-    //   this.audioEncoder.kill();
-    //   this.audioEncoder = null;
-    // }
+    if (this.audioEncoder) {
+      this.audioEncoder.kill();
+      this.audioEncoder = null;
+    }
 
-    // if (this.audioDecoder) {
-    //   this.audioDecoder.kill();
-    //   this.audioDecoder = null;
-    // }
+    if (this.audioDecoder) {
+      this.audioDecoder.kill();
+      this.audioDecoder = null;
+    }
 
     delete this.secret;
-    // this.speakingQueue.length = 0;
+    this.speakingQueue.length = 0;
   }
   heartbeat() {
     this.socket.send(OPCODE_HEARTBEAT, Date.now());
@@ -197,14 +197,14 @@ class VoiceSocket {
         mode: this.mode
       });
     };
-    // transport.onAudioPacket = (packet) => {
-    //   if (!this.audioDecoder)
-    //     return;
-    //   if (typeof this.audioDecoder.enqueue !== "function")
-    //     throw new Error("AudioDecoder does not implement enqueue()");
+    transport.onAudioPacket = (packet) => {
+      if (!this.audioDecoder)
+        return;
+      if (typeof this.audioDecoder.enqueue !== "function")
+        throw new Error("AudioDecoder does not implement enqueue()");
 
-    //   this.audioDecoder.enqueue(packet);
-    // };
+      this.audioDecoder.enqueue(packet);
+    };
     transport.onError = (error) => {
       this.disconnect(error);
     };
