@@ -48,7 +48,7 @@ class Controller {
    * @private
    */
   play(voiceData, url) {
-    let connectionProcess = this.getConnection(voiceData.guildId);
+    let connectionProcess = this.getConnection(voiceData);
 
     let data = {
       type: Operations.AUDIO_PLAY,
@@ -79,11 +79,11 @@ class Controller {
    * @returns ChildProcess
    * @private
    */
-  getConnection(guildId) {
-    let connectionProcess = this.connections.get(guildId);
+  getConnection(voiceData) {
+    let connectionProcess = this.connections.get(voiceData.guildId);
 
     if (!connectionProcess) {
-      connectionProcess = this.createConnection(guildId);
+      connectionProcess = this.createConnection(voiceData);
     }
 
     return connectionProcess;
@@ -95,10 +95,18 @@ class Controller {
    * @returns ChildProcess
    * @private
    */
-  createConnection(guildId) {
-    let connectionProcess = child_process.fork("./core/connection/connectionProcess", [JSON.stringify({guildId: guildId})]);
-    this.hookConnectionProccess(guildId, connectionProcess);
-    this.connections.set(guildId, connectionProcess);
+  createConnection(voiceData) {
+    let connectionProcess = child_process.fork("./core/connection/connectionProcess", [
+      voiceData.endpoint,
+      voiceData.guildId,
+      voiceData.channelId,
+      voiceData.userId,
+      voiceData.sessionId,
+      voiceData.token
+    ]);
+
+    this.hookConnectionProccess(voiceData.guildId, connectionProcess);
+    this.connections.set(voiceData.guildId, connectionProcess);
 
     return connectionProcess;
   }
@@ -154,6 +162,7 @@ class Controller {
    */
   hookConnectionProccess(guildId, connectionProcess) {
     connectionProcess.on("message", (message) => {
+
       const type = message.type;
       const data = message.data;
 
@@ -205,6 +214,7 @@ class Controller {
     let ws = this.websocket;
 
     ws.on("open", () => {
+      console.log('Apollo connection open.');
       const data = {
         op: OPCodes.IDENTIFY,
         d: {
@@ -242,6 +252,8 @@ class Controller {
     if (err) {
       console.log(err);
     }
+
+    console.log('Apollo connection closed.');
 
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
@@ -328,6 +340,7 @@ class Controller {
     case Operations.AUDIO_PLAY:
       var voiceData = {
         endpoint:   data.endpoint,
+        guildId:    data.guildId,
         channelId:  data.channelId,
         userId:     data.userId,
         sessionId:  data.sessionId,

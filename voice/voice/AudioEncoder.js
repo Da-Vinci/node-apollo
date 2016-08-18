@@ -1,8 +1,8 @@
 "use strict";
 
 const fork = require("child_process").fork;
-const EncoderWorker = require("./threading/EncoderWorker");
-const AudioEncoderStream = require("./streams/AudioEncoderStream");
+const EncoderWorker = require(__dirname + "/threading/EncoderWorker");
+const AudioEncoderStream = require(__dirname + "/streams/AudioEncoderStream");
 const Constants = require("../Constants");
 
 var useBufferFrom = false;
@@ -151,7 +151,6 @@ class AudioEncoder {
 
     const _defaultOptions = Object.assign({}, defaultOptions);
     this.options = Object.assign(_defaultOptions, options);
-
     if (this.disposed) {
       if (options.multiThreadedVoice) {
         this.worker = fork(__dirname + "/threading/EncoderWorker");
@@ -176,7 +175,7 @@ class AudioEncoder {
           if (!this.voicews.connected) break;
           if (!msg.packet) break;
 
-          let packetData = msg.packet.data;
+          var packetData = msg.packet.data;
           if (msg.packet instanceof Buffer)
             packetData = msg.packet;
           if (Array.isArray(packetData)) { // received from separate process

@@ -7,29 +7,40 @@ const Events = Constants.Events;
 
 const Player = require("./Player");
 
-
 /**
  * VoiceConnection manager process
  * @class Connection
- * @param {Number} guildId The guild id of the connection
+ * @param {String} endpoint gateway endpoint
+ * @param {String} guildId The guild id of the connection
+ * @param {String} channelId The channel id for this connection
+ * @param {String} userId The user id of the client
+ * @param {String} sessionId The session id for this connection
+ * @param {String} token The voice connection token
  * @prop {Player} player The player for this connection
  */
 class Connection {
 
-  constructor(guildId) {
-    this.guildId = guildId;
-
-    this.player = new Player(guildId);
+  constructor() {
+    this.player = new Player(...arguments);
   }
 
   /**
    * Start the audio player and IPC listener
    * @private
    */
-  start() {
+  start(endpoint, guildId, channelId, userId, sessionId, token) {
+    this.voiceData = {
+      endpoint:  endpoint,
+      guildId:   guildId,
+      channelId: channelId,
+      userId:    userId,
+      sessionId: sessionId,
+      token:     token
+    };
+
     process.on("message", (message) => {
       const type = message.type;
-      const data = message.data;
+      const data = Object.assign({voiceData: this.voiceData}, message.data);
 
       switch (type) {
 
@@ -71,7 +82,7 @@ class Connection {
       let data = {
         type: Events.AUDIO_START,
         data: {
-          guildId: this.guildId
+          guildId: this.voiceData.guildId
         }
       };
 
@@ -82,7 +93,7 @@ class Connection {
       let data = {
         type: Events.AUDIO_END,
         data: {
-          guildId: this.guildId
+          guildId: this.voiceData.guildId
         }
       };
 

@@ -9,7 +9,9 @@ class BaseSocket extends WebSocket {
   constructor(url) {
     super(url);
     this.readyState = Constants.ReadyState.CONNECTING;
-    this.on("open", () => this.readyState = Constants.ReadyState.OPEN);
+    this.on("open", () => {
+      this.readyState = Constants.ReadyState.OPEN
+    });
 
     const close = () => {
       this.unsetHeartbeat();
