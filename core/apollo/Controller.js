@@ -27,6 +27,8 @@ class Controller extends EventEmitter {
     this.loadavg = [0, 0, 0];
     this.cpus = 0;
     this.load = 0;
+
+    this.start();
   }
 
 

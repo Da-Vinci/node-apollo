@@ -4,6 +4,7 @@ const BaseSocket = require("./BaseSocket");
 const Constants = require("../../Constants");
 const Errors = Constants.Errors;
 const Events = Constants.Events;
+const DiscordieError = require("../../core/DiscordieError");
 const EncryptionModes = Constants.EncryptionModes;
 const AudioEncoder = require("../../voice/AudioEncoder");
 const AudioDecoder = require("../../voice/AudioDecoder");
@@ -85,6 +86,9 @@ class VoiceSocket {
             data.heartbeat_interval
           );
         }
+
+        this.connectAudioTransport(data.ssrc, data.port, data.modes);
+        callback();
       } else if (op === OPCODE_SPEAKING) {
         this.canStream && this.audioTransportSocket.connected ?
           emitSpeaking(data) :
