@@ -18,10 +18,15 @@ const IVoiceConnection = require("../../voice/interfaces/IVoiceConnection");
  */
 class Player extends EventEmitter {
 
-  constructor(guildId) {
+  constructor(endpoint, guildId, channelId, userId, sessionId, token) {
     super();
 
-    this.guildId = guildId;
+    this.endpoint = endpoint || null;
+    this.guildId = guildId || null;
+    this.channelId = channelId || null;
+    this.userId = userId || null;
+    this.sessionId = sessionId || null;
+    this.token = token || null;
 
     this.voiceSocket = null;
     this.voiceConnection = null;
@@ -40,18 +45,17 @@ class Player extends EventEmitter {
    * @returns VoiceSocket
    * @private
    */
-  createVoiceSocket(endpoint, guildId, channelId, userId, sessionId, token, callback) {
-    var canReconnect = endpoint ? true : false;
-
+  createVoiceSocket(callback) {
+    var canReconnect = this.endpoint ? true : false;
     if (!canReconnect) return;
 
-    let voiceSocket = new VoiceSocket(guildId);
+    let voiceSocket = new VoiceSocket(this.guildId);
     this.voiceSocket = voiceSocket;
 
-    const serverId = guildId || channelId;
+    const serverId = this.guildId || this.channelId;
     voiceSocket.connect(
-      endpoint.split(":")[0],
-      serverId, userId, sessionId, token,
+      this.endpoint.split(":")[0],
+      serverId, this.userId, this.sessionId, this.token,
       () => {
         callback(voiceSocket);
       }
@@ -70,12 +74,12 @@ class Player extends EventEmitter {
    * @returns VoiceConnection
    * @private
    */
-  createVoiceConnection(endpoint, guildId, channelId, userId, sessionId, token, callback) {
+  createVoiceConnection(callback) {
     if (this.voiceConnection) {
       return this.voiceConnection;
     }
 
-    this.createVoiceSocket(endpoint, guildId, channelId, userId, sessionId, token, (voiceSocket) => {
+    this.createVoiceSocket((voiceSocket) => {
       let voiceConnection = new IVoiceConnection(voiceSocket);
       this.voiceConnection = voiceConnection;
 
@@ -93,7 +97,7 @@ class Player extends EventEmitter {
    * @returns Promise
    * @private
    */
-  getVoiceConnection(endpoint, channelId, userId, sessionId, token) {
+  getVoiceConnection() {
     if (this.voiceConnection) {
       return this.voiceConnection;
     }
@@ -101,7 +105,7 @@ class Player extends EventEmitter {
     let self = this;
 
     return new Promise((resolve) => {
-      this.createVoiceConnection(endpoint, this.guildId, channelId, userId, sessionId, token, () => {
+      this.createVoiceConnection(() => {
         resolve(self.voiceConnection);
       });
     });

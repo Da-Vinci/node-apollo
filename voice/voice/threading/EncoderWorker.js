@@ -546,7 +546,7 @@ Object.assign(EncoderWorker.prototype, {
 
   sendIPC: sendIPC,
   sendPacket: sendPacket,
-  sendNeedBuffer: sendNeedBuffer,
+  sendNeedBuffer: sendNeedBuffer
 });
 
 module.exports = EncoderWorker;

@@ -32,8 +32,8 @@ class Connection extends EventEmitter {
     this.guildId    = data.guildId;
     this.channelId  = data.channelId;
     this.userId     = data.userId;
-    this.sessionId  = this.sessionId;
-    this.token      = this.token;
+    this.sessionId  = data.sessionId;
+    this.token      = data.token;
 
     this.controller = null;
   }

@@ -1,9 +1,12 @@
 
 "use strict";
 
-const WebSocketServer = require("ws").Server;
+const path = require('path');
 
+const WebSocketServer = require("ws").Server;
 const Controller = require("./Controller");
+
+require('dotenv').config({ silent: true, path: path.join(__dirname, '../../.env') });
 
 
 /**
@@ -42,11 +45,14 @@ class Apollo {
 
     if (!process.env.APOLLO_TOKEN) throw new Error("Missing environment variable APOLLO_TOKEN");
 
+    console.log('Creating Apollo WSS Server on port 8443');
+
     this.wss = new WebSocketServer({port: 8443});
 
     let wss = this.wss;
 
     wss.on("connection", (ws) => {
+      console.log('Controller connected.');
       let controller = new Controller(ws);
       this.controllers.push(controller);
     });

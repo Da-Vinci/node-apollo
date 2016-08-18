@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-require('dotenv').config({ silent: true });
+const path = require('path');
+
+require('dotenv').config({ silent: true, path: path.join(__dirname, '.env') });
 
 const Controller = require("./lib").Controller;
-const controller = new Controller({ wssUrl: process.env.WSS_URL });
+const controller = new Controller({ wsURL: process.env.WSS_URL });
