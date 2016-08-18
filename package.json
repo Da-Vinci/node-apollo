@@ -17,8 +17,10 @@
   },
   "homepage": "https://github.com/Da-Vinci/node-apollo#readme",
   "dependencies": {
+    "dns": "^0.2.2",
     "dotenv": "^2.0.0",
     "ebml": "^2.2.0",
+    "tweetnacl": "^0.14.3",
     "ws": "^1.1.1"
   }
 }
