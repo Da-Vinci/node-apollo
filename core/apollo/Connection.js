@@ -36,6 +36,8 @@ class Connection extends EventEmitter {
     this.token      = data.token;
 
     this.controller = null;
+
+    this.playing = false;
   }
 
 
@@ -57,11 +59,11 @@ class Connection extends EventEmitter {
 
     // Hook events
     controller.on("start", (data) => {
-      if (data.guildId === this.guildId) return this.emit("start", data);
+      if (data.guildId === this.guildId) return this.started();
     });
 
     controller.on("end", (data) => {
-      if (data.guildId === this.guildId) return this.emit("end", data);
+      if (data.guildId === this.guildId) return this.ended();
     });
     //
 
@@ -150,6 +152,20 @@ class Connection extends EventEmitter {
         guildId: this.guildId
       }
     });
+  }
+
+
+  /**
+   * Called when the audio starts playing
+   */
+  started() {
+    this.playing = true;
+    this.emit("start");
+  }
+
+  ended() {
+    this.playing = false;
+    this.emit("end");
   }
 
 }
