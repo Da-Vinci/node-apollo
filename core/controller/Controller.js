@@ -16,7 +16,7 @@ const Events = Constants.Events;
  * Controller manages Apollo requests
  * @class Controller
  * @param {Object} options Controller options
- * @param {String?} options.name An identifier for the controller, optional
+ * @param {String} options.id An identifier for the controller, optional
  * @param {String} options.wsURL The websocket url to connect to
  * @param {Number} options.reconnectTimeout The timeout (in seconds) before attempting to re-connect to a closed websocket
  * @prop {WebSocket} websocket The websocket of the controller
@@ -27,7 +27,7 @@ const Events = Constants.Events;
 class Controller {
 
   constructor(options) {
-    this.name = options.name;
+    this.id = process.env.APOLLO_ID || Math.floor(Math.random() * 100000).toString(36);
     this.wsURL = options.wsURL;
     this.reconnectTimeout = options.reconnectTimeout || 5000;
 
@@ -218,7 +218,7 @@ class Controller {
       const data = {
         op: OPCodes.IDENTIFY,
         d: {
-          name: this.name,
+          id: this.id,
           token: process.env.APOLLO_TOKEN
         }
       };

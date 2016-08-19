@@ -14,16 +14,15 @@ require('dotenv').config({ silent: true, path: path.join(__dirname, '../../.env'
  * @class Apollo
  * @param {Object} options Options for the apollo instance
  * @prop {WebSocketServer} wss The websocket server being managed
- * @prop {Array<Controller>} controllers Controllers connected to this Apollo instance
- * @prop {Map<Connection>} connections Registered connections
+ * @prop {Map<Controller>} controllers Controllers connected to this Apollo instance
  */
 class Apollo {
 
   constructor(options) {
     this.wss = null;
-    this.controllers = [];
 
-    this.connections = new Map();
+    this.unavailableControllers = [];
+    this.controllers = new Map();
 
     this.start();
   }
@@ -34,7 +33,7 @@ class Apollo {
    * @returns Controller
   */
   get lowestLoadController() {
-    return this.controllers.sort((a, b) => a.load - b.load)[0];
+    return [...this.controllers.values()].sort((a, b) => a.load - b.load)[0];
   }
 
   /**
@@ -52,9 +51,34 @@ class Apollo {
     let wss = this.wss;
 
     wss.on("connection", (ws) => {
-      console.log('Controller connected.');
       let controller = new Controller(ws);
-      this.controllers.push(controller);
+      this.unavailableControllers.push(controller);
+
+      controller.once("close", () => {
+        if (controller.id) {
+          this.controllers.delete(controller.id);
+        }
+      });
+
+      var identify = (data) => {
+        clearTimeout(timeout);
+        this.unavailableControllers.splice(this.unavailableControllers.indexOf(controller), 1);
+
+        if (data.token === process.env.APOLLO_TOKEN) {
+          controller.id = data.id;
+          this.controllers.set(data.id, controller);
+        }
+        else {
+          ws.close();
+        }
+      };
+
+      let timeout = setTimeout(() => {
+        controller.removeListener("identify", identify);
+        this.unavailableControllers.splice(this.unavailableControllers.indexOf(controller), 1);
+      }, (10 * 1000));
+
+      controller.once("identify", identify);
     });
 
     wss.on("error", (e) => {

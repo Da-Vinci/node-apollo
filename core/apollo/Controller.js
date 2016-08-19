@@ -13,6 +13,7 @@ const Events = Constants.Events;
  * @class Controller
  * @extends EventEmitter
  * @param {WebSocket} websocket The websocket connection belonging to this controller
+ * @param {String?} id The ID of this controller
  * @prop {Array<Number>} loadavg The loadavg of this controller
  * @prop {Number} cpus The number of cpus of this controller
  * @prop {Number} load Loadavg in the last minute as a percentage, normalized to [0-1]
@@ -23,6 +24,8 @@ class Controller extends EventEmitter {
     super();
 
     this.websocket = websocket;
+
+    this.id = null;
 
     this.loadavg = [0, 0, 0];
     this.cpus = 0;
@@ -73,14 +76,7 @@ class Controller extends EventEmitter {
       break;
 
     case OPCodes.IDENTIFY:
-      if (data.token === process.env.APOLLO_TOKEN) {
-        this.sendWS({
-          op: OPCodes.CONNECTED,
-          d: {
-            token: this.token
-          }
-        });
-      }
+      this.emit("identify", data);
 
       break;
 
