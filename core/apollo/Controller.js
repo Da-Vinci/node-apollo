@@ -111,11 +111,11 @@ class Controller extends EventEmitter {
 
     switch (type) {
 
-    case Events.AUDIO_STARTED:
+    case Events.AUDIO_START:
       this.emit("start", data);
       break;
 
-    case Events.AUDIO_ENDED:
+    case Events.AUDIO_END:
       this.emit("end", data);
       break;
 

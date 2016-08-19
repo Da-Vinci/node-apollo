@@ -98,15 +98,13 @@ class Player extends EventEmitter {
    * @private
    */
   getVoiceConnection() {
-    if (this.voiceConnection) {
-      return this.voiceConnection;
-    }
-
-    let self = this;
-
     return new Promise((resolve) => {
-      this.createVoiceConnection(() => {
-        resolve(self.voiceConnection);
+      if (this.voiceConnection) {
+        return resolve(this.voiceConnection);
+      }
+
+      this.createVoiceConnection((voiceConnection) => {
+        resolve(voiceConnection);
       });
     });
   }
@@ -122,13 +120,11 @@ class Player extends EventEmitter {
    * @private
    */
   play(data) {
-    const voiceData = data.voiceData;
-
     if (this.playing) {
       this.stop();
     }
 
-    this.getVoiceConnection(voiceData.endpoint, voiceData.channelId, voiceData.userId, voiceData.sessionId, voiceData.token).then((voiceConnection) => {
+    this.getVoiceConnection().then((voiceConnection) => {
       let encoder = voiceConnection.createExternalEncoder({
         type: "ffmpeg",
         format: "opus",
