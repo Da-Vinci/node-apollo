@@ -76,14 +76,14 @@ class Player extends EventEmitter {
    */
   createVoiceConnection(callback) {
     if (this.voiceConnection) {
-      return this.voiceConnection;
+      return callback(this.voiceConnection);
     }
 
     this.createVoiceSocket((voiceSocket) => {
       let voiceConnection = new IVoiceConnection(voiceSocket);
       this.voiceConnection = voiceConnection;
 
-      callback();
+      callback(this.voiceConnection);
     });
   }
 
