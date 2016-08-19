@@ -20,15 +20,9 @@ const Player = require("./Player");
  */
 class Connection {
 
-  constructor() {
+  constructor(endpoint, guildId, channelId, userId, sessionId, token) {
     this.player = new Player(...arguments);
-  }
 
-  /**
-   * Start the audio player and IPC listener
-   * @private
-   */
-  start(endpoint, guildId, channelId, userId, sessionId, token) {
     this.voiceData = {
       endpoint:  endpoint,
       guildId:   guildId,
@@ -37,10 +31,16 @@ class Connection {
       sessionId: sessionId,
       token:     token
     };
+  }
 
+  /**
+   * Start the audio player and IPC listener
+   * @private
+   */
+  start() {
     process.on("message", (message) => {
       const type = message.type;
-      const data = Object.assign({voiceData: this.voiceData}, message.data);
+      const data = message.data;
 
       switch (type) {
 

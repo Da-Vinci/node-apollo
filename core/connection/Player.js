@@ -11,7 +11,13 @@ const IVoiceConnection = require("../../voice/interfaces/IVoiceConnection");
  * Manages the voice connection and playing audio
  * @class Player
  * @extends EventEmitter
- * @param {Number} guildId The guild id of the connection
+ * @param {String} endpoint gateway endpoint
+ * @param {String} guildId The guild id of the connection
+ * @param {String} channelId The channel id for this connection
+ * @param {String} userId The user id of the client
+ * @param {String} sessionId The session id for this connection
+ * @param {String} token The voice connection token
+ * @prop {Player} player The player for this connection
  * @prop {VoiceSocket} voiceSocket The VoiceSocket of the player
  * @prop {VoiceConnection} voiceConnection The VoiceConnection of the player
  * @prop {Boolean} playing Whether the player is currently playing
@@ -21,12 +27,12 @@ class Player extends EventEmitter {
   constructor(endpoint, guildId, channelId, userId, sessionId, token) {
     super();
 
-    this.endpoint = endpoint || null;
-    this.guildId = guildId || null;
-    this.channelId = channelId || null;
-    this.userId = userId || null;
-    this.sessionId = sessionId || null;
-    this.token = token || null;
+    this.endpoint = endpoint;
+    this.guildId = guildId;
+    this.channelId = channelId;
+    this.userId = userId;
+    this.sessionId = sessionId;
+    this.token = token;
 
     this.voiceSocket = null;
     this.voiceConnection = null;
