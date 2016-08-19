@@ -22,5 +22,8 @@
     "ebml": "^2.2.0",
     "tweetnacl": "^0.14.3",
     "ws": "^1.1.1"
+  },
+  "optionalDependencies": {
+    "ffmpeg-static": "^2.0.0"
   }
 }
