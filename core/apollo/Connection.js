@@ -38,6 +38,7 @@ class Connection extends EventEmitter {
     this.controller = null;
 
     this.playing = false;
+    this.paused = false;
   }
 
 
@@ -48,7 +49,7 @@ class Connection extends EventEmitter {
    */
   getController() {
     if (!this.apollo) throw new Error("Apollo instance not present, did you initialize the Connection properly?");
-    if (this.controller && this.apollo.controllers.get(this.controller.id)) return this.controller;
+    if (this.controller && this.apollo.controllers.has(this.controller.id)) return this.controller;
 
     let controller = this.apollo.lowestLoadController;
     this.controller = controller;
@@ -137,6 +138,8 @@ class Connection extends EventEmitter {
         guildId: this.guildId
       }
     });
+
+    this.paused = true;
   }
 
   /**
@@ -152,6 +155,8 @@ class Connection extends EventEmitter {
         guildId: this.guildId
       }
     });
+
+    this.paused = false;
   }
 
 
