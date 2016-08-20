@@ -54,7 +54,7 @@ class Apollo {
       let controller = new Controller(ws);
       this.unavailableControllers.push(controller);
 
-      controller.once("close", () => {
+      ws.once("close", () => {
         if (controller.id) {
           this.controllers.delete(controller.id);
         }

@@ -48,7 +48,7 @@ class Connection extends EventEmitter {
    */
   getController() {
     if (!this.apollo) throw new Error("Apollo instance not present, did you initialize the Connection properly?");
-    if (this.controller) return this.controller;
+    if (this.controller && this.apollo.controllers.get(controller.id)) return this.controller;
 
     let controller = this.apollo.lowestLoadController;
     this.controller = controller;
