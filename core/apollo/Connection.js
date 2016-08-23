@@ -6,7 +6,7 @@ const EventEmitter = require("events").EventEmitter;
 const Constants = require("../Constants");
 const OPCodes = Constants.OPCodes;
 const Operations = Constants.Operations;
-
+const apollo = require('./Apollo');
 
 /**
  * Connection interface object
@@ -23,17 +23,20 @@ const Operations = Constants.Operations;
  */
 class Connection extends EventEmitter {
 
-  constructor(apollo, data) {
+  constructor(channel, client, session, token, server, endpoint) {
     super();
 
-    this.apollo = apollo;
+    this.apollo = apollo();
 
-    this.endpoint   = data.endpoint;
-    this.guildId    = data.guildId;
-    this.channelId  = data.channelId;
-    this.userId     = data.userId;
-    this.sessionId  = data.sessionId;
-    this.token      = data.token;
+    this.endpoint   = endpoint;
+    this.guildId    = server.id;
+    this.channelId  = channel.id;
+    this.userId     = client.user.id;
+    this.sessionId  = session;
+    this.token      = token;
+
+    console.log(this.apollo);
+    console.log(this.endpoint, this.guildId, this.channelId, this.userId, this.sessionId, this.token);
 
     this.controller = null;
 
@@ -165,7 +168,7 @@ class Connection extends EventEmitter {
    */
   started() {
     this.playing = true;
-    this.emit("start");
+    this.emit("ready");
   }
 
   ended() {

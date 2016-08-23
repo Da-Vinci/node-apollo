@@ -8,6 +8,7 @@ const Controller = require("./Controller");
 
 require('dotenv').config({ silent: true, path: path.join(__dirname, '../../.env') });
 
+var apollo;
 
 /**
  * The Apollo manager instance
@@ -89,4 +90,12 @@ class Apollo {
 }
 
 
-module.exports = Apollo;
+// module.exports = Apollo;
+module.exports = function (token) {
+  if (token) {
+    apollo = new Apollo({ token });
+    return apollo;
+  }
+
+  if (apollo) return apollo;
+}
