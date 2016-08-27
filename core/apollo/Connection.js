@@ -42,6 +42,8 @@ class Connection extends EventEmitter {
 
     this.playing = false;
     this.paused = false;
+    
+    process.nextTick(()=>this.emit("ready"))
   }
 
 
