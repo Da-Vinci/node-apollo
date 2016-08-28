@@ -82,7 +82,8 @@ class Controller {
   getConnection(voiceData) {
     let connectionProcess = this.connections.get(voiceData.guildId);
 
-    if (!connectionProcess) {
+    if (!connectionProcess || connectionProcess.spawnargs[6] !== voiceData.sessionId) {
+      this.destroyConnection(voiceData.guildId);
       connectionProcess = this.createConnection(voiceData);
     }
 
