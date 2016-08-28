@@ -98,4 +98,4 @@ module.exports = function (token) {
   }
 
   if (apollo) return apollo;
-}
+};
