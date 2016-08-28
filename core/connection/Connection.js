@@ -78,6 +78,17 @@ class Connection {
       }
     });
 
+    this.player.on("ready", () => {
+      let data = {
+        type: Events.AUDIO_READY,
+        data: {
+          guildId: this.voiceData.guildId
+        }
+      };
+
+      process.send(data);
+    });
+
     this.player.on("start", () => {
       let data = {
         type: Events.AUDIO_START,

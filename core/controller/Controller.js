@@ -168,6 +168,16 @@ class Controller {
 
       switch (type) {
 
+      case Events.AUDIO_RESUME:
+        var readyData = {
+          op: OPCodes.DISPATCH,
+          t: Events.AUDIO_READY,
+          d: data
+        };
+
+        this.sendWS(readyData);
+        break;
+
       case Events.AUDIO_START:
         var startData = {
           op: OPCodes.DISPATCH,

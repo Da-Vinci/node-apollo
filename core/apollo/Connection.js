@@ -42,8 +42,6 @@ class Connection extends EventEmitter {
 
     this.playing = false;
     this.paused = false;
-    
-    process.nextTick(()=>this.emit("ready"))
   }
 
 
@@ -64,6 +62,10 @@ class Connection extends EventEmitter {
     }
 
     // Hook events
+    controller.on("ready", (data) => {
+      if (data.guildId === this.guildId) return this.ready();
+    });
+
     controller.on("start", (data) => {
       if (data.guildId === this.guildId) return this.started();
     });
@@ -166,13 +168,23 @@ class Connection extends EventEmitter {
 
 
   /**
+   * Called when the voice socket connects
+   */
+  ready() {
+    this.emit("ready");
+  }
+
+  /**
    * Called when the audio starts playing
    */
   started() {
     this.playing = true;
-    this.emit("ready");
+    this.emit("start");
   }
 
+  /**
+   * Called when the audio stops playing
+   */
   ended() {
     this.playing = false;
     this.emit("end");

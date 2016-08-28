@@ -64,6 +64,8 @@ class Player extends EventEmitter {
       serverId, this.userId, this.sessionId, this.token,
       () => {
         callback(voiceSocket);
+
+        this.emit("ready");
       }
     );
   }

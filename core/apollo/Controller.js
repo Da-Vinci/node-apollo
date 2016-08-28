@@ -107,6 +107,10 @@ class Controller extends EventEmitter {
 
     switch (type) {
 
+    case Events.AUDIO_READY:
+      this.emit("ready", data);
+      break;
+
     case Events.AUDIO_START:
       this.emit("start", data);
       break;

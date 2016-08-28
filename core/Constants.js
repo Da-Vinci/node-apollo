@@ -18,8 +18,9 @@ const Constants = {
   },
 
   Events: {
-    AUDIO_START: 0,
-    AUDIO_END: 1
+    AUDIO_READY: 0,
+    AUDIO_START: 1,
+    AUDIO_END: 2
   }
 };
 
