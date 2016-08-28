@@ -169,7 +169,7 @@ class Controller {
 
       switch (type) {
 
-      case Events.AUDIO_RESUME:
+      case Events.AUDIO_READY:
         var readyData = {
           op: OPCodes.DISPATCH,
           t: Events.AUDIO_READY,
